@@ -17,8 +17,15 @@ mongoose.connect(mongoDB, {
 });
 
 app.use(express.json({ limit: '50mb' }));
-app.get('/', (req, res) => {
-  res.send('Hello World!')
+app.get('/api/stores', (req, res) => {
+  Store.find({}, (err, stores) => {
+    if (err) {
+      res.status(500).send(err);
+    } else {
+      res.status(200).send(stores);
+    }
+  });
+  // res.send('Hello World!')
 })
 
 app.post('/api/stores', (req, res) => {
