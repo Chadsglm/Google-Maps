@@ -22,18 +22,44 @@ app.get('/', (req, res) => {
 })
 
 app.post('/api/stores', (req, res) => {
-  let dbStores = req.body;
-  // console.log(dbStores);
-  let store = new Store({
-    storeName: 'Test',
-    phoneNumber: '23456789',
-    location: {
-      type: 'Point',
-      coordinates: [34.101461, -118.326497]
+  const stores = req.body;
+  let dbStores = [];
+
+  for (const store of stores) {
+    dbStores.push({
+      storeName: store.name,
+      phoneNumber: store.phoneNumber,
+      address: store.address,
+      openStatusText: store.openStatusText,
+      addressLines: store.addressLines,
+      location: {
+        type: 'Point',
+        coordinates: [
+          store.coordinates.longitude,
+          store.coordinates.latitude
+        ]
+      }
+    })
+  }
+
+  Store.create(dbStores, (err, stores) => {
+    if (err) {
+      res.status(500).send(err);
+    } else {
+      res.status(200).send(stores);
     }
   })
-  store.save();
-  res.send('You have posted')
+
+  // console.log(dbStores);
+  // res.send('You have posted')
+})
+
+app.delete('/api/stores', (req, res) => {
+  Store.deleteMany({}, (err) => {
+    if (err) throw err;
+    res.status(200).send(err)
+    console.log("Deleted All Store");
+  })
 })
 
 app.listen(port, () => {
